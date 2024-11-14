@@ -5,8 +5,11 @@ import './artillery.scss';
 
 
 function Artillery() {
+
+/*******       Vars       *******/
+  var seconds = 0; //time elapsed
   const scrollableContainerRef = useRef(null);
-    //refs for canvas graphics
+    //refs for canvas
   const plyrBase = useRef(null);
   const cpuBase = useRef(null);
   const plyrMissile = useRef(null);
@@ -23,6 +26,7 @@ function Artillery() {
     baseDistanceMaxMod: 600,
     stageWidth: 1000 + baseSize,
     stageHeight: 400,
+    animationFrameDelay: 1,
   }
 
       //state
@@ -31,7 +35,7 @@ function Artillery() {
     gamesWon: 0, 
     gamesPlayed: 0, 
     roundNum: 0, 
-    winPercentage: 0 
+    winPercentage: 0, 
   })
   const [cpuData, setCpuData] = useState()
   const [plyrData, setPlyrData] = useState();
@@ -39,6 +43,48 @@ function Artillery() {
   const [turnLog, setTurnLog] = useState();
   const [isEndgameScreen, setIsEndgameScreen] = useState(false);
 
+
+
+/*******       useEffects       *******/
+  useEffect(() => {
+    const missileAnimation = (data) => {
+      const missile = data.missileRef.current;
+      
+      var xDisplacement = missilePath(data.choices.degrees, data.choices.speed, seconds, "horizontal");
+      var yDisplacement = missilePath(data.choices.degrees, data.choices.speed, seconds, "vertical");
+
+      if (missile.y() <= data.missileCoords.initY) {
+        missile.x(data.missileCoords.initX + (xDisplacement * data.missileDirection));
+        missile.y(data.missileCoords.initY - yDisplacement);
+        seconds += 1, 
+        missile.getLayer().batchDraw();
+      }
+      if (missile.y() > data.missileCoords.initY) {
+        if (data.type === "human") {
+          setPlyrData(prev => ({
+            ...prev,
+            firing: false, 
+          }));
+        } else if (data.type === "cpu") {
+          setCpuData(prev => ({
+            ...prev,
+            firing: false, 
+          }));
+        }
+        resetMissile(data);
+      }
+    };
+
+    if (plyrData?.firing) {
+      console.log("player firing!");//!DEBUG
+      const frameId = setInterval(() => missileAnimation(plyrData), conf.animationFrameDelay);
+      return () => clearInterval(frameId);
+    } else if (cpuData?.firing) {
+      console.log("CPU firing!");//!DEBUG
+      const frameId = setInterval(() => missileAnimation(cpuData), conf.animationFrameDelay);
+      return () => clearInterval(frameId);
+    }
+  }, [plyrData, cpuData]);
 
  useEffect(() => {
     const scrollableContainer = scrollableContainerRef.current;
@@ -63,6 +109,7 @@ function Artillery() {
 
 
 
+/*******       Functions       *******/
   const startGame = () => {
     setGameStats(prev => ({ ...prev, gamesPlayed: prev.gamesPlayed + 1, roundNum: 1 }));
     resetGame();
@@ -76,6 +123,11 @@ function Artillery() {
     setGameLog([]);
     setGameSettings(populateDefaultGameSettings());
     setIsEndgameScreen(false);
+  }
+
+  const resetMissile = (data) => {
+    data.missileRef.current.x(data.missileCoords.initX);
+    data.missileRef.current.y(data.missileCoords.initY);
   }
 
   const handleTurn = () => {
@@ -96,8 +148,12 @@ function Artillery() {
   const humanTurn = () => {
     var degrees = plyrData.choices.degrees; 
     var speed = plyrData.choices.speed;
-    console.log(plyrData)
     const playerMissileDist = calculateMissileTravel(degrees, speed);
+    setPlyrData(prevState => ({
+      ...prevState,
+      firing: true, 
+    }));
+
     if (isMissileHit(playerMissileDist)) {
       setTurnLog(prev => ({
         ...prev,
@@ -175,6 +231,16 @@ function Artillery() {
     return Math.floor((speed * speed * Math.sin(2 * radians)) / 9.80665);
   };
 
+  const missilePath = (degrees, launchSpeed, timeElapsed, direction) => {
+    const radianAngle = degrees * (Math.PI / 180);
+
+    if (direction === "horizontal") {
+      return launchSpeed*Math.cos(radianAngle)*timeElapsed;
+    } else if (direction === "vertical") {
+      return launchSpeed*Math.sin(radianAngle)*timeElapsed - (0.5 * 9.81 * timeElapsed * timeElapsed);
+    }
+  }
+
   const isMissileHit = (playerMissileDist) => {
     return Math.abs(playerMissileDist - gameSettings.baseDistanceGap) <= conf.baseRadius;
   }
@@ -187,10 +253,13 @@ function Artillery() {
     return Math.random() > 0.5
   }
 
-    const getBaseOffset = () => {
+  const getBaseOffset = () => {
     return (conf.stageWidth - gameSettings.baseDistanceGap) / 2;
   }
 
+
+
+/*******       Populate Data Functions       *******/
   const populateDefaultPlyrData = () => {
     return {
       type: "human",
@@ -252,6 +321,7 @@ function Artillery() {
   }
 
 
+/*******       RETURN      *******/
   return (
     <div className="artillery-container">
         <h1>React Artillery</h1>
