@@ -87,10 +87,11 @@ function Artillery() {
     const playerMissileDist = calculateMissileTravel(degrees, speed);
     if (isMissileHit(playerMissileDist)) {
       setTurnLog(prev => ({
-      ...prev,
-      msgNum: prev.msgNum + 1,
-      msg: prev.msg + "player wins!\n"
+        ...prev,
+        msgNum: prev.msgNum + 1,
+        msg: prev.msg + "player wins!\n"
       }));
+      setGameStats(prev => ({ ...prev, gamesWon: prev.gamesWon + 1 }));
       return true;
     } else {
       setTurnLog(prev => ({
@@ -200,6 +201,8 @@ function Artillery() {
                 <p key={index}dangerouslySetInnerHTML={{ __html: log.replace(/\n/g, '<br />') }} />
               ))}
             </div>
+
+            <p>Your win percentage is: {((gameStats.gamesWon / gameStats.gamesPlayed) * 100).toFixed(2)}%</p>
           </div>
         )}
     </div>
