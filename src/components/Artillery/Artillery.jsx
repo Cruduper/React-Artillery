@@ -38,13 +38,17 @@ function Artillery() {
     setGameConfig(prev => ({ 
       ...prev, 
       baseDistanceGap: getBaseDistance(),
-      isCpuFirst: true
+      isCpuFirst: getPlayerOrder()
     }));
   };
 
   const getBaseDistance = () => {
     return Math.floor(settings.baseDistanceMin + Math.random() * settings.baseDistanceMaxMod)
   } 
+
+  const getPlayerOrder = () => {
+    return Math.random() > 0.5
+  }
 
 
   return (
