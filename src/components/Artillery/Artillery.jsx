@@ -27,6 +27,7 @@ function Artillery() {
     stageWidth: 1000 + baseSize,
     stageHeight: 400,
     animationFrameDelay: 1,
+    timeScale: .2
   }
 
       //state
@@ -56,7 +57,7 @@ function Artillery() {
       if (missile.y() <= data.missileCoords.initY) {
         missile.x(data.missileCoords.initX + (xDisplacement * data.missileDirection));
         missile.y(data.missileCoords.initY - yDisplacement);
-        seconds += 1, 
+        seconds += 1 * conf.timeScale, 
         missile.getLayer().batchDraw();
       }
       if (missile.y() > data.missileCoords.initY) {
