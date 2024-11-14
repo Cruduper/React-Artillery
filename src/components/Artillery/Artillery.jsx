@@ -19,18 +19,20 @@ function Artillery() {
     roundNum: 0, 
     winPercentage: 0 
   })
-  const [cpuData, setCpuData] = useState({
+  const defaultCpuData = {
     degrees: 0,
     speed: 0,
     minDegreeBound: 25,
     maxDegreeOffset: 20,
     minSpeedBound: 55,
     maxSpeedOffset: 35
-  })
-  const [plyrData, setPlyrData] = useState({ 
-    degrees: 0, 
-    speed: 0 
-  });
+  };
+  const [cpuData, setCpuData] = useState(defaultCpuData)
+  const defaultPlyrData = { 
+    degrees: 45, 
+    speed: 50 
+  };
+  const [plyrData, setPlyrData] = useState(defaultPlyrData);
   const [gameLog, setGameLog] = useState([]);
   const defaultTurnLog = {
     msgNum: 0,
@@ -41,21 +43,14 @@ function Artillery() {
 
 
   useEffect(() => {
-    console.log(gameConfig); //!DEBUG
+    // console.log(gameConfig); //!DEBUG
   }, [gameConfig]);
 
   useEffect(() => {
     if (turnLog.msgNum === 2) {
       setGameLog(prev => [...prev, turnLog.msg]);
-      console.log("turnLog = ...");
-      console.log(turnLog);
     }
   }, [turnLog]);
-
-  useEffect(() => {
-    console.log("gameLog = ...");
-    console.log(gameLog);
-  }, [gameLog]);
 
 
 
@@ -66,6 +61,8 @@ function Artillery() {
       baseDistanceGap: getBaseDistance(),
       isCpuFirst: getPlayerOrder()
     }));
+    setPlyrData(defaultPlyrData);
+    setGameLog([]);
   };
 
   const handleTurn = () => {
@@ -86,6 +83,7 @@ function Artillery() {
   const humanTurn = () => {
     var degrees = plyrData.degrees; 
     var speed = plyrData.speed;
+    console.log(plyrData)
     const playerMissileDist = calculateMissileTravel(degrees, speed);
     if (isMissileHit(playerMissileDist)) {
       setTurnLog(prev => ({
@@ -175,8 +173,24 @@ function Artillery() {
             <p>{gameConfig.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
 
             <div>
-              <input placeholder="Angle" type="number" onChange={(e) => setPlyrData(prev => ({ ...prev, degrees: parseFloat(e.target.value) }))} />
-              <input placeholder="Speed" type="number" onChange={(e) => setPlyrData(prev => ({ ...prev, speed: parseFloat(e.target.value) }))} />
+              <label>
+                Angle:
+                <input 
+                  placeholder="Angle (degrees)" 
+                  type="number"
+                  value={plyrData.degrees}  
+                  onChange={(e) => setPlyrData(prev => ({ ...prev, degrees: parseFloat(e.target.value) }))} 
+                />
+              </label>
+              <label>
+                Speed:
+                <input 
+                  placeholder="Speed (m/s)" 
+                  type="number"
+                  value={plyrData.speed}
+                  onChange={(e) => setPlyrData(prev => ({ ...prev, speed: parseFloat(e.target.value) }))} 
+                />
+              </label>
               <button onClick={() => handleTurn()} >Play Turn!</button>
               <button onClick={() => startGame()} >New Game</button>
             </div>
