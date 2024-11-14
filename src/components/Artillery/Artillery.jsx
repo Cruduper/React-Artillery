@@ -48,6 +48,7 @@ function Artillery() {
 
   const handleTurn = () => {
     console.log("in handleTurn..."); //!DEBUG
+    setGameStats(prev => ({ ...prev, roundNum: prev.roundNum + 1 }));
 
     if (gameConfig.isCpuFirst) {
       if (!cpuTurn()) {
