@@ -35,6 +35,10 @@ function Artillery() {
     console.log(gameConfig); //!DEBUG
   }, [gameConfig]);
 
+  useEffect(() => {
+    console.log(plyrData); //!DEBUG
+  }, [plyrData]);
+
 
 
   const startGame = () => {
@@ -88,7 +92,11 @@ function Artillery() {
         <p>The distance between you and your opponent's base is: {gameConfig.baseDistanceGap} meters away.</p>
         <p>{gameConfig.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
         <button onClick={() => startGame()} >Start Game</button>
-        <button onClick={() => handleTurn()} >Play Turn!</button>
+        <div>
+          <input placeholder="Angle" type="number" onChange={(e) => setPlyrData(prev => ({ ...prev, degrees: parseFloat(e.target.value) }))} />
+          <input placeholder="Speed" type="number" onChange={(e) => setPlyrData(prev => ({ ...prev, speed: parseFloat(e.target.value) }))} />
+          <button onClick={() => handleTurn()} >Play Turn!</button>
+        </div>
     </div>
   );
 }
