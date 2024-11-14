@@ -87,16 +87,23 @@ function Artillery() {
   return (
     <div className="artillery-container">
         <h1>React Artillery</h1>
-        <h2>Game #{gameStats.gamesPlayed}</h2>
-        <h3>Round #{gameStats.roundNum}</h3>
-        <p>The distance between you and your opponent's base is: {gameConfig.baseDistanceGap} meters away.</p>
-        <p>{gameConfig.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
-        <button onClick={() => startGame()} >Start Game</button>
-        <div>
-          <input placeholder="Angle" type="number" onChange={(e) => setPlyrData(prev => ({ ...prev, degrees: parseFloat(e.target.value) }))} />
-          <input placeholder="Speed" type="number" onChange={(e) => setPlyrData(prev => ({ ...prev, speed: parseFloat(e.target.value) }))} />
-          <button onClick={() => handleTurn()} >Play Turn!</button>
-        </div>
+        { gameStats.gamesPlayed == 0 && (
+          <button onClick={() => startGame()} >Start Game</button>
+        )}
+        { gameStats.gamesPlayed > 0 && (
+          <div className="gameDisplay">
+            <h2>Game #{gameStats.gamesPlayed}</h2>
+            <h3>Round #{gameStats.roundNum}</h3>
+            <p>The distance between you and your opponent's base is: {gameConfig.baseDistanceGap} meters away.</p>
+            <p>{gameConfig.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
+            <div>
+              <input placeholder="Angle" type="number" onChange={(e) => setPlyrData(prev => ({ ...prev, degrees: parseFloat(e.target.value) }))} />
+              <input placeholder="Speed" type="number" onChange={(e) => setPlyrData(prev => ({ ...prev, speed: parseFloat(e.target.value) }))} />
+              <button onClick={() => handleTurn()} >Play Turn!</button>
+              <button onClick={() => startGame()} >New Game</button>
+            </div>
+          </div>
+        )}
     </div>
   );
 }
