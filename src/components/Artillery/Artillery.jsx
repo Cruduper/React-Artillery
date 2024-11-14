@@ -66,14 +66,19 @@ function Artillery() {
   };
 
   const playerTurn = () => {
-    console.log("in playerTurn..."); //!DEBUG
-    return false
+      return false;
   };
 
   const cpuTurn = () => {
-    console.log("in cpuTurn..."); //!DEBUG
     return false
   };
+
+  const calculateMissileTravel = (degrees, speed) => {
+    const radians = degrees * (Math.PI / 180);
+    return Math.floor((speed * speed * Math.sin(2 * radians)) / 9.80665);
+  };
+
+
 
   const getBaseDistance = () => {
     return Math.floor(settings.baseDistanceMin + Math.random() * settings.baseDistanceMaxMod)
