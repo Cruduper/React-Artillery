@@ -78,7 +78,10 @@ function Artillery() {
     return Math.floor((speed * speed * Math.sin(2 * radians)) / 9.80665);
   };
 
-
+  const isMissileHit = () => {
+    const playerMissileDist = calculateMissileTravel(degrees, speed);
+    return Math.abs(playerMissileDist - baseDistanceGap) <= baseRadius;
+  }
 
   const getBaseDistance = () => {
     return Math.floor(settings.baseDistanceMin + Math.random() * settings.baseDistanceMaxMod)
