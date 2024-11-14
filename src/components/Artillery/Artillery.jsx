@@ -78,7 +78,18 @@ function Artillery() {
   };
 
   const cpuTurn = () => {
-    return false
+    const degrees = cpuData.minDegreeBound + Math.random() * cpuData.maxDegreeOffset;
+    const speed = cpuData.minSpeedBound + Math.random() * cpuData.maxSpeedOffset;
+    setCpuData(prev => ({ ...prev, degrees, speed }));
+    const cpuMissileDist = calculateMissileTravel(degrees, speed);
+    if (isMissileHit(cpuMissileDist)) {
+      console.log("CPU wins!");//!DEBUG
+      return true;
+    } else {
+      console.log(`The CPU's missile missed your base by ${cpuMissileDist - gameConfig.baseDistanceGap} meters.`);
+      recalculateCpuBounds(cpuMissileDist)
+      return false;
+    }
   };
 
   const recalculateCpuBounds = (cpuMissileDist) => {
