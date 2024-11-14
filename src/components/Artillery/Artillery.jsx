@@ -5,6 +5,7 @@ import './artillery.scss';
 
 
 function Artillery() {
+  const scrollableContainerRef = useRef(null);
     //refs for canvas graphics
   const plyrBase = useRef(null);
   const cpuBase = useRef(null);
@@ -39,6 +40,12 @@ function Artillery() {
   const [isEndgameScreen, setIsEndgameScreen] = useState(false);
 
 
+ useEffect(() => {
+    const scrollableContainer = scrollableContainerRef.current;
+    if (scrollableContainer) {
+      scrollableContainer.scrollTop = scrollableContainer.scrollHeight;
+    }
+  }, [gameLog]);
 
   useEffect(() => {
     setGameSettings(populateDefaultGameSettings());
@@ -339,7 +346,7 @@ function Artillery() {
               { isEndgameScreen && <button onClick={() => startGame()} >New Game</button>}
             </div>
 
-            <div className="artillery-log">
+            <div className="artillery-log" ref={scrollableContainerRef}>
               {gameLog.map((log, index) => (
                 <p key={index}dangerouslySetInnerHTML={{ __html: log.replace(/\n/g, '<br />') }} />
               ))}
