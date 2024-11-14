@@ -1,12 +1,11 @@
 import './App.css'
+import Artillery from './components/Artillery/Artillery'
 
 function App() {
 
   return (
     <>
-      <p>
-        Hello World
-      </p>
+      <Artillery/>
     </>
   )
 }
