@@ -55,17 +55,26 @@ function Artillery() {
 
     if (gameConfig.isCpuFirst) {
       if (!cpuTurn()) {
-        playerTurn();
+        humanTurn();
       } 
     } else {
-      if (!playerTurn()) {
+      if (!humanTurn()) {
         cpuTurn();
       }
     }
   };
 
-  const playerTurn = () => {
+  const humanTurn = () => {
+    var degrees = plyrData.degrees; 
+    var speed = plyrData.speed;
+    const playerMissileDist = calculateMissileTravel(degrees, speed);
+    if (isMissileHit(playerMissileDist)) {
+      console.log("player wins!");//!DEBUG
+      return true;
+    } else {
+      console.log(`Your missile missed the CPU's base by ${playerMissileDist - gameConfig.baseDistanceGap} meters.`);//!DEBUG
       return false;
+    }
   };
 
   const cpuTurn = () => {
