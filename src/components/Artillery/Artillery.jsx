@@ -1,4 +1,7 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect} from 'react';
+import './artillery.scss';
+
+
 
 function Artillery() {
   const settings = {

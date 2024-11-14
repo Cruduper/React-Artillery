@@ -1,0 +1,31 @@
+.artillery-container {
+  background-color: #333;
+  color: white;
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.artillery-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.artillery-log {
+  background-color: white;
+  color: black;
+  font-size: small;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 5px;
+  height: 200px;
+  width: 60vw;
+  overflow-y: auto;
+}
