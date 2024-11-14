@@ -39,6 +39,7 @@ function Artillery() {
     msg: ""
   }
   const [turnLog, setTurnLog] = useState(defaultTurnLog);
+  const [isEndgameScreen, setIsEndgameScreen] = useState(false);
 
 
 
@@ -63,6 +64,7 @@ function Artillery() {
     }));
     setPlyrData(defaultPlyrData);
     setGameLog([]);
+    setIsEndgameScreen(false);
   };
 
   const handleTurn = () => {
@@ -92,6 +94,7 @@ function Artillery() {
         msg: prev.msg + "player wins!\n"
       }));
       setGameStats(prev => ({ ...prev, gamesWon: prev.gamesWon + 1 }));
+      setIsEndgameScreen(true);
       return true;
     } else {
       setTurnLog(prev => ({
@@ -114,6 +117,7 @@ function Artillery() {
         msgNum: prev.msgNum + 1,
         msg: prev.msg + "CPU wins!\n"
       }));
+      setIsEndgameScreen(true);
       return true;
     } else {
       setTurnLog(prev => ({
@@ -192,8 +196,8 @@ function Artillery() {
                   onChange={(e) => setPlyrData(prev => ({ ...prev, speed: parseFloat(e.target.value) }))} 
                 />
               </label>
-              <button onClick={() => handleTurn()} >Play Turn!</button>
-              <button onClick={() => startGame()} >New Game</button>
+              { !isEndgameScreen && <button onClick={() => handleTurn()} >Play Turn!</button> }
+              { isEndgameScreen && <button onClick={() => startGame()} >New Game</button>}
             </div>
 
             <div className="artillery-log">
