@@ -4,12 +4,12 @@ import './artillery.scss';
 
 
 function Artillery() {
-  const settings = {
+  const conf = {
     baseRadius: 10,
     baseDistanceMin: 350,
     baseDistanceMaxMod: 600
   }
-  const [gameConfig, setGameConfig] = useState({
+  const [gameSettings, setGameSettings] = useState({
     isCpuFirst: false,
     baseDistanceGap: 500,
   })
@@ -45,7 +45,7 @@ function Artillery() {
 
   useEffect(() => {
     // console.log(gameConfig); //!DEBUG
-  }, [gameConfig]);
+  }, [gameSettings]);
 
   useEffect(() => {
     if (turnLog.msgNum === 2) {
@@ -57,7 +57,7 @@ function Artillery() {
 
   const startGame = () => {
     setGameStats(prev => ({ ...prev, gamesPlayed: prev.gamesPlayed + 1, roundNum: 1 }));
-    setGameConfig(prev => ({ 
+    setGameSettings(prev => ({ 
       ...prev, 
       baseDistanceGap: getBaseDistance(),
       isCpuFirst: getPlayerOrder()
@@ -71,7 +71,7 @@ function Artillery() {
     setGameStats(prev => ({ ...prev, roundNum: prev.roundNum + 1 }));
     setTurnLog(defaultTurnLog);
 
-    if (gameConfig.isCpuFirst) {
+    if (gameSettings.isCpuFirst) {
       if (!cpuTurn()) {
         humanTurn();
       } 
@@ -100,7 +100,7 @@ function Artillery() {
       setTurnLog(prev => ({
         ...prev,
         msgNum: prev.msgNum + 1,
-        msg: prev.msg + `Your missile missed the CPU's base by ${playerMissileDist - gameConfig.baseDistanceGap} meters.\n`
+        msg: prev.msg + `Your missile missed the CPU's base by ${playerMissileDist - gameSettings.baseDistanceGap} meters.\n`
       }));
       return false;
     }
@@ -123,7 +123,7 @@ function Artillery() {
       setTurnLog(prev => ({
         ...prev,
         msgNum: prev.msgNum + 1,
-        msg: prev.msg + `The CPU's missile missed your base by ${cpuMissileDist - gameConfig.baseDistanceGap} meters.\n`
+        msg: prev.msg + `The CPU's missile missed your base by ${cpuMissileDist - gameSettings.baseDistanceGap} meters.\n`
       }));
       recalculateCpuBounds(cpuMissileDist)
       return false;
@@ -131,7 +131,7 @@ function Artillery() {
   };
 
   const recalculateCpuBounds = (cpuMissileDist) => {
-    if (cpuMissileDist - gameConfig.baseDistanceGap > 0) {
+    if (cpuMissileDist - gameSettings.baseDistanceGap > 0) {
       setCpuData(prev => ({
         ...prev,
         maxDegreeOffset: prev.degrees - prev.minDegreeBound,
@@ -152,11 +152,11 @@ function Artillery() {
   };
 
   const isMissileHit = (playerMissileDist) => {
-    return Math.abs(playerMissileDist - gameConfig.baseDistanceGap) <= settings.baseRadius;
+    return Math.abs(playerMissileDist - gameSettings.baseDistanceGap) <= conf.baseRadius;
   }
 
   const getBaseDistance = () => {
-    return Math.floor(settings.baseDistanceMin + Math.random() * settings.baseDistanceMaxMod)
+    return Math.floor(conf.baseDistanceMin + Math.random() * conf.baseDistanceMaxMod)
   } 
 
   const getPlayerOrder = () => {
@@ -174,8 +174,8 @@ function Artillery() {
           <div className="gameDisplay">
             <h2>Game #{gameStats.gamesPlayed}</h2>
             <h3>Round #{gameStats.roundNum}</h3>
-            <p>The distance between you and your opponent's base is: {gameConfig.baseDistanceGap} meters away.</p>
-            <p>{gameConfig.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
+            <p>The distance between you and your opponent's base is: {gameSettings.baseDistanceGap} meters away.</p>
+            <p>{gameSettings.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
 
             <div>
               <label>
