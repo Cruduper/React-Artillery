@@ -36,7 +36,7 @@ function Artillery() {
   }, [gameConfig]);
 
   useEffect(() => {
-    console.log(plyrData); //!DEBUG
+    // console.log(plyrData); //!DEBUG
   }, [plyrData]);
 
 
@@ -51,7 +51,6 @@ function Artillery() {
   };
 
   const handleTurn = () => {
-    console.log("in handleTurn..."); //!DEBUG
     setGameStats(prev => ({ ...prev, roundNum: prev.roundNum + 1 }));
 
     if (gameConfig.isCpuFirst) {
@@ -78,9 +77,8 @@ function Artillery() {
     return Math.floor((speed * speed * Math.sin(2 * radians)) / 9.80665);
   };
 
-  const isMissileHit = () => {
-    const playerMissileDist = calculateMissileTravel(degrees, speed);
-    return Math.abs(playerMissileDist - baseDistanceGap) <= baseRadius;
+  const isMissileHit = (playerMissileDist) => {
+    return Math.abs(playerMissileDist - gameConfig.baseDistanceGap) <= settings.baseRadius;
   }
 
   const getBaseDistance = () => {
