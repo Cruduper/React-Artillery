@@ -1,14 +1,30 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Stage, Layer, Rect } from 'react-konva';
 import './artillery.scss';
 
 
 
 function Artillery() {
+    //refs for canvas graphics
+  const plyrBase = useRef(null);
+  const cpuBase = useRef(null);
+  const plyrMissile = useRef(null);
+  const cpuMissile = useRef(null);
+
+    //config vars
+  const baseRadius = 10;
+  const baseSize = baseRadius * 2;
   const conf = {
-    baseRadius: 10,
+    baseRadius: baseRadius,
+    baseSize: baseSize,
+    missileSize: 10,
     baseDistanceMin: 350,
-    baseDistanceMaxMod: 600
+    baseDistanceMaxMod: 600,
+    stageWidth: 1000 + baseSize,
+    stageHeight: 600,
   }
+
+      //state
   const [gameSettings, setGameSettings] = useState({
     isCpuFirst: false,
     baseDistanceGap: 500,
@@ -19,19 +35,48 @@ function Artillery() {
     roundNum: 0, 
     winPercentage: 0 
   })
+  const baseOffset = (conf.stageWidth - gameSettings.baseDistanceGap) / 2;
   const defaultCpuData = {
-    degrees: 0,
-    speed: 0,
-    minDegreeBound: 25,
-    maxDegreeOffset: 20,
-    minSpeedBound: 55,
-    maxSpeedOffset: 35
+    type: "cpu",
+    missileRef: cpuMissile,
+    missileDirection: -1, //moves left instead of right
+    firing: false,
+    choices: {
+      degrees: 0,
+      speed: 0,
+      minDegreeBound: 25,
+      maxDegreeOffset: 20,
+      minSpeedBound: 55,
+      maxSpeedOffset: 35
+    },
+    missileCoords: {
+      initX: conf.stageWidth - conf.missileSize/2 - baseOffset,
+      initY: conf.stageHeight - conf.missileSize,
+    },
+    baseCoords: {
+      x: conf.stageWidth - conf.baseSize/2 - baseOffset,
+      y: conf.stageHeight - conf.baseSize
+    }
   };
   const [cpuData, setCpuData] = useState(defaultCpuData)
-  const defaultPlyrData = { 
-    degrees: 45, 
-    speed: 50 
-  };
+  const defaultPlyrData = {
+      type: "human",
+      missileRef: plyrMissile,
+      missileDirection: 1,
+      firing: false,
+      choices: {
+        degrees: 45,
+        speed: 50,
+      },
+      missileCoords: {
+        initX: 0 + baseOffset - conf.missileSize/2,
+        initY: conf.stageHeight - conf.missileSize,
+      },
+      baseCoords: {
+        x: 0 - baseSize/2 + baseOffset,
+        y: conf.stageHeight - conf.baseSize
+      }
+    };
   const [plyrData, setPlyrData] = useState(defaultPlyrData);
   const [gameLog, setGameLog] = useState([]);
   const defaultTurnLog = {
@@ -40,6 +85,8 @@ function Artillery() {
   }
   const [turnLog, setTurnLog] = useState(defaultTurnLog);
   const [isEndgameScreen, setIsEndgameScreen] = useState(false);
+
+
 
 
 
@@ -83,8 +130,8 @@ function Artillery() {
   };
 
   const humanTurn = () => {
-    var degrees = plyrData.degrees; 
-    var speed = plyrData.speed;
+    var degrees = plyrData.choices.degrees; 
+    var speed = plyrData.choices.speed;
     console.log(plyrData)
     const playerMissileDist = calculateMissileTravel(degrees, speed);
     if (isMissileHit(playerMissileDist)) {
@@ -107,8 +154,8 @@ function Artillery() {
   };
 
   const cpuTurn = () => {
-    const degrees = cpuData.minDegreeBound + Math.random() * cpuData.maxDegreeOffset;
-    const speed = cpuData.minSpeedBound + Math.random() * cpuData.maxSpeedOffset;
+    const degrees = cpuData.choices.minDegreeBound + Math.random() * cpuData.choices.maxDegreeOffset;
+    const speed = cpuData.choices.minSpeedBound + Math.random() * cpuData.choices.maxSpeedOffset;
     setCpuData(prev => ({ ...prev, degrees, speed }));
     const cpuMissileDist = calculateMissileTravel(degrees, speed);
     if (isMissileHit(cpuMissileDist)) {
@@ -174,6 +221,51 @@ function Artillery() {
           <div className="gameDisplay">
             <h2>Game #{gameStats.gamesPlayed}</h2>
             <h3>Round #{gameStats.roundNum}</h3>
+
+            <Stage width={conf.stageWidth} height={conf.stageHeight}>
+              <Layer>
+                <Rect
+                  ref={cpuData.missileRef}
+                  x={cpuData.missileCoords.initX}
+                  y={cpuData.missileCoords.initY}
+                  width={conf.missileSize}
+                  height={conf.missileSize}
+                  fill="blue"
+                />
+              </Layer>
+              <Layer>
+                <Rect
+                  ref={plyrData.missileRef}
+                  x={plyrData.missileCoords.initX}
+                  y={plyrData.missileCoords.initY}
+                  width={conf.missileSize}
+                  height={conf.missileSize}
+                  fill="red"
+                />
+              </Layer>
+              <Layer>
+                <Rect
+                  ref={plyrBase}
+                  x={plyrData.baseCoords.x}
+                  y={plyrData.baseCoords.y}
+                  width={conf.baseSize}
+                  height={conf.baseSize}
+                  fill="rgba(0, 0, 0, 0.35)"
+                />
+              </Layer>
+
+              <Layer>
+                <Rect
+                  ref={cpuBase}
+                  x={cpuData.baseCoords.x}
+                  y={cpuData.baseCoords.y}
+                  width={conf.baseSize}
+                  height={conf.baseSize}
+                  fill="rgba(0, 0, 0, 0.35)"
+                />
+              </Layer>
+            </Stage>
+
             <p>The distance between you and your opponent's base is: {gameSettings.baseDistanceGap} meters away.</p>
             <p>{gameSettings.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
 
@@ -183,7 +275,7 @@ function Artillery() {
                 <input 
                   placeholder="Angle (degrees)" 
                   type="number"
-                  value={plyrData.degrees}  
+                  value={plyrData.choices.degrees}  
                   onChange={(e) => setPlyrData(prev => ({ ...prev, degrees: parseFloat(e.target.value) }))} 
                 />
               </label>
@@ -192,7 +284,7 @@ function Artillery() {
                 <input 
                   placeholder="Speed (m/s)" 
                   type="number"
-                  value={plyrData.speed}
+                  value={plyrData.choices.speed}
                   onChange={(e) => setPlyrData(prev => ({ ...prev, speed: parseFloat(e.target.value) }))} 
                 />
               </label>
