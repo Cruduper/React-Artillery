@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 
 function Artillery() {
   const settings = {
@@ -29,17 +29,26 @@ function Artillery() {
     speed: 0 
   });
 
+  useEffect(() => {
+    console.log(gameConfig); //!DEBUG
+  }, [gameConfig]);
 
-
-
-
+  const startGame = () => {
+    setGameStats(prev => ({ ...prev, gamesPlayed: prev.gamesPlayed + 1, roundNum: 1 }));
+    setGameConfig(prev => ({ 
+      ...prev, 
+      baseDistanceGap: 500,
+      isCpuFirst: true
+    }));
+  };
 
 
 
 
   return (
     <div className="artillery-container">
-      <p>Hello Artillery World! </p>
+        <h1>React Artillery</h1>
+        <button onClick={startGame} >start game</button>
     </div>
   );
 }
