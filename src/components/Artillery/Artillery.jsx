@@ -37,12 +37,14 @@ function Artillery() {
     setGameStats(prev => ({ ...prev, gamesPlayed: prev.gamesPlayed + 1, roundNum: 1 }));
     setGameConfig(prev => ({ 
       ...prev, 
-      baseDistanceGap: 500,
+      baseDistanceGap: getBaseDistance(),
       isCpuFirst: true
     }));
   };
 
-
+  const getBaseDistance = () => {
+    return Math.floor(settings.baseDistanceMin + Math.random() * settings.baseDistanceMaxMod)
+  } 
 
 
   return (
