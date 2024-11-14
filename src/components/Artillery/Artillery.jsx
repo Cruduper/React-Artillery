@@ -82,6 +82,10 @@ function Artillery() {
   return (
     <div className="artillery-container">
         <h1>React Artillery</h1>
+        <h2>Game #{gameStats.gamesPlayed}</h2>
+        <h3>Round #{gameStats.roundNum}</h3>
+        <p>The distance between you and your opponent's base is: {gameConfig.baseDistanceGap} meters away.</p>
+        <p>{gameConfig.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
         <button onClick={() => startGame()} >Start Game</button>
         <button onClick={() => handleTurn()} >Play Turn!</button>
     </div>
