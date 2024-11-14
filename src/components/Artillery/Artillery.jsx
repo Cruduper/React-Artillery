@@ -90,7 +90,7 @@ function Artillery() {
     if (isMissileHit(playerMissileDist)) {
       setTurnLog(prev => ({
         ...prev,
-        msgNum: prev.msgNum + 1,
+        msgNum: 2,
         msg: prev.msg + "player wins!\n"
       }));
       setGameStats(prev => ({ ...prev, gamesWon: prev.gamesWon + 1 }));
@@ -114,7 +114,7 @@ function Artillery() {
     if (isMissileHit(cpuMissileDist)) {
       setTurnLog(prev => ({
         ...prev,
-        msgNum: prev.msgNum + 1,
+        msgNum: 2,
         msg: prev.msg + "CPU wins!\n"
       }));
       setIsEndgameScreen(true);
