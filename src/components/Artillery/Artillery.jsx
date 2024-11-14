@@ -170,11 +170,18 @@ function Artillery() {
             <h3>Round #{gameStats.roundNum}</h3>
             <p>The distance between you and your opponent's base is: {gameConfig.baseDistanceGap} meters away.</p>
             <p>{gameConfig.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
+
             <div>
               <input placeholder="Angle" type="number" onChange={(e) => setPlyrData(prev => ({ ...prev, degrees: parseFloat(e.target.value) }))} />
               <input placeholder="Speed" type="number" onChange={(e) => setPlyrData(prev => ({ ...prev, speed: parseFloat(e.target.value) }))} />
               <button onClick={() => handleTurn()} >Play Turn!</button>
               <button onClick={() => startGame()} >New Game</button>
+            </div>
+
+            <div className="artillery-log">
+              {gameLog.map((log, index) => (
+                <p key={index}dangerouslySetInnerHTML={{ __html: log.replace(/\n/g, '<br />') }} />
+              ))}
             </div>
           </div>
         )}
