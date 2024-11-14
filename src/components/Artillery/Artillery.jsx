@@ -28,6 +28,12 @@ function Artillery() {
     degrees: 0, 
     speed: 0 
   });
+  const [gameLog, setGameLog] = useState([]);
+  const defaultTurnLog = {
+    msgNum: 0,
+    msg: ""
+  }
+  const [turnLog, setTurnLog] = useState(defaultTurnLog);
 
 
 
@@ -36,8 +42,17 @@ function Artillery() {
   }, [gameConfig]);
 
   useEffect(() => {
-    // console.log(plyrData); //!DEBUG
-  }, [plyrData]);
+    if (turnLog.msgNum === 2) {
+      setGameLog(prev => [...prev, turnLog.msg]);
+      console.log("turnLog = ...");
+      console.log(turnLog);
+    }
+  }, [turnLog]);
+
+  useEffect(() => {
+    console.log("gameLog = ...");
+    console.log(gameLog);
+  }, [gameLog]);
 
 
 
@@ -52,6 +67,7 @@ function Artillery() {
 
   const handleTurn = () => {
     setGameStats(prev => ({ ...prev, roundNum: prev.roundNum + 1 }));
+    setTurnLog(defaultTurnLog);
 
     if (gameConfig.isCpuFirst) {
       if (!cpuTurn()) {
@@ -69,10 +85,18 @@ function Artillery() {
     var speed = plyrData.speed;
     const playerMissileDist = calculateMissileTravel(degrees, speed);
     if (isMissileHit(playerMissileDist)) {
-      console.log("player wins!");//!DEBUG
+      setTurnLog(prev => ({
+      ...prev,
+      msgNum: prev.msgNum + 1,
+      msg: prev.msg + "player wins!\n"
+      }));
       return true;
     } else {
-      console.log(`Your missile missed the CPU's base by ${playerMissileDist - gameConfig.baseDistanceGap} meters.`);//!DEBUG
+      setTurnLog(prev => ({
+        ...prev,
+        msgNum: prev.msgNum + 1,
+        msg: prev.msg + `Your missile missed the CPU's base by ${playerMissileDist - gameConfig.baseDistanceGap} meters.\n`
+      }));
       return false;
     }
   };
@@ -83,10 +107,18 @@ function Artillery() {
     setCpuData(prev => ({ ...prev, degrees, speed }));
     const cpuMissileDist = calculateMissileTravel(degrees, speed);
     if (isMissileHit(cpuMissileDist)) {
-      console.log("CPU wins!");//!DEBUG
+      setTurnLog(prev => ({
+        ...prev,
+        msgNum: prev.msgNum + 1,
+        msg: prev.msg + "CPU wins!\n"
+      }));
       return true;
     } else {
-      console.log(`The CPU's missile missed your base by ${cpuMissileDist - gameConfig.baseDistanceGap} meters.`);
+      setTurnLog(prev => ({
+        ...prev,
+        msgNum: prev.msgNum + 1,
+        msg: prev.msg + `The CPU's missile missed your base by ${cpuMissileDist - gameConfig.baseDistanceGap} meters.\n`
+      }));
       recalculateCpuBounds(cpuMissileDist)
       return false;
     }
