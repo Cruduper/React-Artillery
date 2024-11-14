@@ -81,6 +81,22 @@ function Artillery() {
     return false
   };
 
+  const recalculateCpuBounds = (cpuMissileDist) => {
+    if (cpuMissileDist - gameConfig.baseDistanceGap > 0) {
+      setCpuData(prev => ({
+        ...prev,
+        maxDegreeOffset: prev.degrees - prev.minDegreeBound,
+        maxSpeedOffset: prev.speed - prev.minSpeedBound
+      }));
+    } else {
+      setCpuData(prev => ({
+        ...prev,
+        minDegreeBound: prev.degrees,
+        minSpeedBound: prev.speed,
+      }));
+    }
+  };
+
   const calculateMissileTravel = (degrees, speed) => {
     const radians = degrees * (Math.PI / 180);
     return Math.floor((speed * speed * Math.sin(2 * radians)) / 9.80665);
