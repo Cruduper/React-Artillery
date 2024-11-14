@@ -21,81 +21,35 @@ function Artillery() {
     baseDistanceMin: 350,
     baseDistanceMaxMod: 600,
     stageWidth: 1000 + baseSize,
-    stageHeight: 600,
+    stageHeight: 400,
   }
 
       //state
-  const [gameSettings, setGameSettings] = useState({
-    isCpuFirst: false,
-    baseDistanceGap: 500,
-  })
+  const [gameSettings, setGameSettings] = useState()
   const [gameStats, setGameStats] = useState({ 
     gamesWon: 0, 
     gamesPlayed: 0, 
     roundNum: 0, 
     winPercentage: 0 
   })
-  const baseOffset = (conf.stageWidth - gameSettings.baseDistanceGap) / 2;
-  const defaultCpuData = {
-    type: "cpu",
-    missileRef: cpuMissile,
-    missileDirection: -1, //moves left instead of right
-    firing: false,
-    choices: {
-      degrees: 0,
-      speed: 0,
-      minDegreeBound: 25,
-      maxDegreeOffset: 20,
-      minSpeedBound: 55,
-      maxSpeedOffset: 35
-    },
-    missileCoords: {
-      initX: conf.stageWidth - conf.missileSize/2 - baseOffset,
-      initY: conf.stageHeight - conf.missileSize,
-    },
-    baseCoords: {
-      x: conf.stageWidth - conf.baseSize/2 - baseOffset,
-      y: conf.stageHeight - conf.baseSize
-    }
-  };
-  const [cpuData, setCpuData] = useState(defaultCpuData)
-  const defaultPlyrData = {
-      type: "human",
-      missileRef: plyrMissile,
-      missileDirection: 1,
-      firing: false,
-      choices: {
-        degrees: 45,
-        speed: 50,
-      },
-      missileCoords: {
-        initX: 0 + baseOffset - conf.missileSize/2,
-        initY: conf.stageHeight - conf.missileSize,
-      },
-      baseCoords: {
-        x: 0 - baseSize/2 + baseOffset,
-        y: conf.stageHeight - conf.baseSize
-      }
-    };
-  const [plyrData, setPlyrData] = useState(defaultPlyrData);
+  const [cpuData, setCpuData] = useState()
+  const [plyrData, setPlyrData] = useState();
   const [gameLog, setGameLog] = useState([]);
-  const defaultTurnLog = {
-    msgNum: 0,
-    msg: ""
-  }
-  const [turnLog, setTurnLog] = useState(defaultTurnLog);
+  const [turnLog, setTurnLog] = useState();
   const [isEndgameScreen, setIsEndgameScreen] = useState(false);
 
 
 
-
+  useEffect(() => {
+    setGameSettings(populateDefaultGameSettings());
+  }, []);
 
   useEffect(() => {
-    // console.log(gameConfig); //!DEBUG
-  }, [gameSettings]);
+    console.log(cpuData?.choices); //!DEBUG
+  }, [cpuData]);
 
   useEffect(() => {
-    if (turnLog.msgNum === 2) {
+    if (turnLog?.msgNum === 2) {
       setGameLog(prev => [...prev, turnLog.msg]);
     }
   }, [turnLog]);
@@ -104,19 +58,22 @@ function Artillery() {
 
   const startGame = () => {
     setGameStats(prev => ({ ...prev, gamesPlayed: prev.gamesPlayed + 1, roundNum: 1 }));
-    setGameSettings(prev => ({ 
-      ...prev, 
-      baseDistanceGap: getBaseDistance(),
-      isCpuFirst: getPlayerOrder()
-    }));
-    setPlyrData(defaultPlyrData);
-    setGameLog([]);
-    setIsEndgameScreen(false);
+    resetGame();
   };
+
+  const resetGame = () => {
+    setGameSettings(populateDefaultGameSettings());
+    setPlyrData(populateDefaultPlyrData());
+    setCpuData(populateDefaultCpuData());
+    setTurnLog(populateDefaultTurnLog());
+    setGameLog([]);
+    setGameSettings(populateDefaultGameSettings());
+    setIsEndgameScreen(false);
+  }
 
   const handleTurn = () => {
     setGameStats(prev => ({ ...prev, roundNum: prev.roundNum + 1 }));
-    setTurnLog(defaultTurnLog);
+    setTurnLog(populateDefaultTurnLog());
 
     if (gameSettings.isCpuFirst) {
       if (!cpuTurn()) {
@@ -156,7 +113,14 @@ function Artillery() {
   const cpuTurn = () => {
     const degrees = cpuData.choices.minDegreeBound + Math.random() * cpuData.choices.maxDegreeOffset;
     const speed = cpuData.choices.minSpeedBound + Math.random() * cpuData.choices.maxSpeedOffset;
-    setCpuData(prev => ({ ...prev, degrees, speed }));
+    setCpuData(prev => ({ 
+      ...prev, 
+      choices: {
+        ...prev.choices,
+        degrees: degrees, 
+        speed: speed 
+      }
+    }));
     const cpuMissileDist = calculateMissileTravel(degrees, speed);
     if (isMissileHit(cpuMissileDist)) {
       setTurnLog(prev => ({
@@ -181,14 +145,20 @@ function Artillery() {
     if (cpuMissileDist - gameSettings.baseDistanceGap > 0) {
       setCpuData(prev => ({
         ...prev,
-        maxDegreeOffset: prev.degrees - prev.minDegreeBound,
-        maxSpeedOffset: prev.speed - prev.minSpeedBound
+        choices: {
+          ...prev.choices,
+          maxDegreeOffset: prev.choices.degrees - prev.choices.minDegreeBound,
+          maxSpeedOffset: prev.choices.speed - prev.choices.minSpeedBound,
+        }
       }));
     } else {
       setCpuData(prev => ({
         ...prev,
-        minDegreeBound: prev.degrees,
-        minSpeedBound: prev.speed,
+        choices: {
+          ...prev.choices,
+          minDegreeBound: prev.choices.degrees,
+          minSpeedBound: prev.choices.speed,
+        }
       }));
     }
   };
@@ -210,6 +180,70 @@ function Artillery() {
     return Math.random() > 0.5
   }
 
+    const getBaseOffset = () => {
+    return (conf.stageWidth - gameSettings.baseDistanceGap) / 2;
+  }
+
+  const populateDefaultPlyrData = () => {
+    return {
+      type: "human",
+      missileRef: plyrMissile,
+      missileDirection: 1,
+      firing: false,
+      choices: {
+        degrees: 45,
+        speed: 50,
+      },
+      missileCoords: {
+        initX: 0 + getBaseOffset() - conf.missileSize/2,
+        initY: conf.stageHeight - conf.missileSize,
+      },
+      baseCoords: {
+        x: 0 - baseRadius + getBaseOffset(),
+        y: conf.stageHeight - conf.baseSize
+      }
+    }
+  };
+
+    const populateDefaultCpuData = () => {
+    return {
+      type: "cpu",
+      missileRef: cpuMissile,
+      missileDirection: -1, //moves left instead of right
+      firing: false,
+      choices: {
+        degrees: 0,
+        speed: 0,
+        minDegreeBound: 25,
+        maxDegreeOffset: 20,
+        minSpeedBound: 55,
+        maxSpeedOffset: 35
+      },
+      missileCoords: {
+        initX: conf.stageWidth - conf.missileSize/2 - getBaseOffset(),
+        initY: conf.stageHeight - conf.missileSize,
+      },
+      baseCoords: {
+        x: conf.stageWidth - conf.baseSize/2 - getBaseOffset(),
+        y: conf.stageHeight - conf.baseSize
+      }
+    }
+  };
+
+  const populateDefaultTurnLog = () => {
+    return {
+      msgNum: 0,
+      msg: ""
+    }
+  }
+
+  const populateDefaultGameSettings = () => {
+    return {
+      isCpuFirst: getPlayerOrder(),
+      baseDistanceGap: getBaseDistance(),
+    }
+  }
+
 
   return (
     <div className="artillery-container">
@@ -221,50 +255,51 @@ function Artillery() {
           <div className="gameDisplay">
             <h2>Game #{gameStats.gamesPlayed}</h2>
             <h3>Round #{gameStats.roundNum}</h3>
+            <div className="artillery-animation">
+              <Stage width={conf.stageWidth} height={conf.stageHeight}>
+                <Layer>
+                  <Rect
+                    ref={cpuData.missileRef}
+                    x={cpuData.missileCoords.initX}
+                    y={cpuData.missileCoords.initY}
+                    width={conf.missileSize}
+                    height={conf.missileSize}
+                    fill="blue"
+                  />
+                </Layer>
+                <Layer>
+                  <Rect
+                    ref={plyrData.missileRef}
+                    x={plyrData.missileCoords.initX}
+                    y={plyrData.missileCoords.initY}
+                    width={conf.missileSize}
+                    height={conf.missileSize}
+                    fill="red"
+                  />
+                </Layer>
+                <Layer>
+                  <Rect
+                    ref={plyrBase}
+                    x={plyrData.baseCoords.x}
+                    y={plyrData.baseCoords.y}
+                    width={conf.baseSize}
+                    height={conf.baseSize}
+                    fill="rgba(0, 0, 0, 0.35)"
+                  />
+                </Layer>
 
-            <Stage width={conf.stageWidth} height={conf.stageHeight}>
-              <Layer>
-                <Rect
-                  ref={cpuData.missileRef}
-                  x={cpuData.missileCoords.initX}
-                  y={cpuData.missileCoords.initY}
-                  width={conf.missileSize}
-                  height={conf.missileSize}
-                  fill="blue"
-                />
-              </Layer>
-              <Layer>
-                <Rect
-                  ref={plyrData.missileRef}
-                  x={plyrData.missileCoords.initX}
-                  y={plyrData.missileCoords.initY}
-                  width={conf.missileSize}
-                  height={conf.missileSize}
-                  fill="red"
-                />
-              </Layer>
-              <Layer>
-                <Rect
-                  ref={plyrBase}
-                  x={plyrData.baseCoords.x}
-                  y={plyrData.baseCoords.y}
-                  width={conf.baseSize}
-                  height={conf.baseSize}
-                  fill="rgba(0, 0, 0, 0.35)"
-                />
-              </Layer>
-
-              <Layer>
-                <Rect
-                  ref={cpuBase}
-                  x={cpuData.baseCoords.x}
-                  y={cpuData.baseCoords.y}
-                  width={conf.baseSize}
-                  height={conf.baseSize}
-                  fill="rgba(0, 0, 0, 0.35)"
-                />
-              </Layer>
-            </Stage>
+                <Layer>
+                  <Rect
+                    ref={cpuBase}
+                    x={cpuData.baseCoords.x}
+                    y={cpuData.baseCoords.y}
+                    width={conf.baseSize}
+                    height={conf.baseSize}
+                    fill="rgba(0, 0, 0, 0.35)"
+                  />
+                </Layer>
+              </Stage>
+            </div>
 
             <p>The distance between you and your opponent's base is: {gameSettings.baseDistanceGap} meters away.</p>
             <p>{gameSettings.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
@@ -276,7 +311,13 @@ function Artillery() {
                   placeholder="Angle (degrees)" 
                   type="number"
                   value={plyrData.choices.degrees}  
-                  onChange={(e) => setPlyrData(prev => ({ ...prev, degrees: parseFloat(e.target.value) }))} 
+                  onChange={(e) => setPlyrData(prev => ({ 
+                  ...prev, 
+                    choices: {
+                      ...prev.choices,
+                      degrees: parseFloat(e.target.value) 
+                    }
+                  }))} 
                 />
               </label>
               <label>
@@ -285,7 +326,13 @@ function Artillery() {
                   placeholder="Speed (m/s)" 
                   type="number"
                   value={plyrData.choices.speed}
-                  onChange={(e) => setPlyrData(prev => ({ ...prev, speed: parseFloat(e.target.value) }))} 
+                  onChange={(e) => setPlyrData(prev => ({ 
+                    ...prev, 
+                    choices: {
+                      ...prev.choices,
+                      speed: parseFloat(e.target.value) 
+                    }
+                  }))}  
                 />
               </label>
               { !isEndgameScreen && <button onClick={() => handleTurn()} >Play Turn!</button> }
