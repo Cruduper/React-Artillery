@@ -29,9 +29,13 @@ function Artillery() {
     speed: 0 
   });
 
+
+
   useEffect(() => {
     console.log(gameConfig); //!DEBUG
   }, [gameConfig]);
+
+
 
   const startGame = () => {
     setGameStats(prev => ({ ...prev, gamesPlayed: prev.gamesPlayed + 1, roundNum: 1 }));
@@ -40,6 +44,30 @@ function Artillery() {
       baseDistanceGap: getBaseDistance(),
       isCpuFirst: getPlayerOrder()
     }));
+  };
+
+  const handleTurn = () => {
+    console.log("in handleTurn..."); //!DEBUG
+
+    if (gameConfig.isCpuFirst) {
+      if (!cpuTurn()) {
+        playerTurn();
+      } 
+    } else {
+      if (!playerTurn()) {
+        cpuTurn();
+      }
+    }
+  };
+
+  const playerTurn = () => {
+    console.log("in playerTurn..."); //!DEBUG
+    return false
+  };
+
+  const cpuTurn = () => {
+    console.log("in cpuTurn..."); //!DEBUG
+    return false
   };
 
   const getBaseDistance = () => {
@@ -54,7 +82,8 @@ function Artillery() {
   return (
     <div className="artillery-container">
         <h1>React Artillery</h1>
-        <button onClick={startGame} >start game</button>
+        <button onClick={() => startGame()} >Start Game</button>
+        <button onClick={() => handleTurn()} >Play Turn!</button>
     </div>
   );
 }
