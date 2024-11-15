@@ -21,11 +21,11 @@ function Artillery() {
   const conf = {
     baseRadius: baseRadius,
     baseSize: baseSize,
-    missileSize: 10,
-    baseDistanceMin: 350,
-    baseDistanceMaxMod: 600,
-    stageWidth: 980 + baseSize,
-    stageHeight: 400,
+    missileSize: 5,
+    baseDistanceMin: 400,
+    baseDistanceMaxMod: 400, //min and maxMod should equal stageWidth
+    stageWidth: 780 + baseSize,
+    stageHeight: 350,
     animationFrameDelay: 1,
     timeScale: .1
   }
@@ -250,7 +250,7 @@ function Artillery() {
   }
 
   const isMissileHit = (playerMissileDist) => {
-    return Math.abs(playerMissileDist - gameSettings.baseDistanceGap) <= conf.baseRadius;
+    return Math.abs(playerMissileDist - gameSettings.baseDistanceGap) <= (conf.baseRadius/1.3);
   }
 
   const getBaseDistance = () => {
@@ -298,10 +298,10 @@ function Artillery() {
       choices: {
         degrees: 0,
         speed: 0,
-        minDegreeBound: 25,
-        maxDegreeOffset: 20,
-        minSpeedBound: 55,
-        maxSpeedOffset: 35
+        minDegreeBound: 30,
+        maxDegreeOffset: 25,
+        minSpeedBound: 50,
+        maxSpeedOffset: 50
       },
       missileCoords: {
         initX: conf.stageWidth - conf.missileSize/2 - getBaseOffset(),
@@ -336,8 +336,8 @@ function Artillery() {
         { gameStats.gamesPlayed == 0 && (
           <button className="artillery-button" onClick={() => startGame()} >Start Game</button>
         )}
-        { gameStats.gamesPlayed > 0 && plyrData && cpuData &&(
-          <div className="gameDisplay">
+        { gameStats.gamesPlayed > 0 && plyrData && cpuData && conf && (
+          <div className="gameDisplay" style={{width: conf.stageWidth}}>
             <div className="game-and-round-container">
               <h3 className="game-number">Game #{gameStats.gamesPlayed}</h3>
               <h3 className="round-number">Round #{gameStats.roundNum}</h3>
