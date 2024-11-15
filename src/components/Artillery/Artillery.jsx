@@ -387,7 +387,8 @@ function Artillery() {
                       ...prev.choices,
                       degrees: parseFloat(e.target.value) 
                     }
-                  }))} 
+                  }))}
+                  disabled={cpuData.firing || plyrData.firing} 
                 />
               </label>
               <label>
@@ -402,10 +403,11 @@ function Artillery() {
                       ...prev.choices,
                       speed: parseFloat(e.target.value) 
                     }
-                  }))}  
+                  }))} 
+                  disabled={cpuData.firing || plyrData.firing} 
                 />
               </label>
-              { !isEndgameScreen && <button onClick={() => handleTurn()} >Play Turn!</button> }
+              { !isEndgameScreen && <button onClick={() => handleTurn()} disabled={cpuData.firing || plyrData.firing}>Play Turn!</button> }
               { isEndgameScreen && <button onClick={() => startGame()} >New Game</button>}
             </div>
 
