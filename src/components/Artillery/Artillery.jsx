@@ -9,7 +9,6 @@ function Artillery() {
 /*******       Vars       *******/
   var seconds = 0; //time elapsed
   const scrollableContainerRef = useRef(null);
-  const isFiring = useRef(false)
     //refs for canvas
   const plyrBase = useRef(null);
   const cpuBase = useRef(null);
@@ -44,6 +43,7 @@ function Artillery() {
   const [gameLog, setGameLog] = useState([]);
   const [turnLog, setTurnLog] = useState();
   const [isEndgameScreen, setIsEndgameScreen] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(false);
 
 
 
@@ -93,8 +93,10 @@ function Artillery() {
     } else if (cpuData?.firing) {
       const frameId = setInterval(() => missileAnimation(cpuData), conf.animationFrameDelay);
       return () => clearInterval(frameId);
+    } else if (gameStats.roundNum > 1) {
+      setAnimationComplete(true);
     }
-  }, [plyrData, cpuData]);
+  }, [plyrData?.firing, cpuData?.firing]);
 
  useEffect(() => {
     const scrollableContainer = scrollableContainerRef.current;
@@ -104,10 +106,11 @@ function Artillery() {
   }, [gameLog]);
 
   useEffect(() => {
-    if (turnLog?.msgNum === 2) {
+    if (turnLog?.msgNum === 2 && animationComplete) {
       setGameLog(prev => [...prev, turnLog.msg]);
+      setAnimationComplete(false);
     }
-  }, [turnLog]);
+  }, [turnLog, animationComplete]);
 
 
 
