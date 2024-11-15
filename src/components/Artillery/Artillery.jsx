@@ -44,6 +44,7 @@ function Artillery() {
   const [turnLog, setTurnLog] = useState();
   const [isEndgameScreen, setIsEndgameScreen] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
+  const [winner, setWinner] = useState();
 
 
 
@@ -55,6 +56,7 @@ function Artillery() {
       setIsEndgameScreen(false);
       setPlyrData(populateDefaultPlyrData());
       setCpuData(populateDefaultCpuData());
+      setWinner(null);
     }
   }, [gameSettings]);
 
@@ -115,9 +117,14 @@ function Artillery() {
   useEffect(() => {
     if (turnLog?.msgNum === 2 && animationComplete) {
       setGameLog(prev => [...prev, turnLog.msg]);
-      setAnimationComplete(false);
     }
   }, [turnLog, animationComplete]);
+
+  useEffect(() => {
+    if (winner && animationComplete) {
+        setIsEndgameScreen(true);
+    }
+  },[animationComplete, winner]);
 
 
 
@@ -133,6 +140,7 @@ function Artillery() {
   }
 
   const handleTurn = () => {
+    setAnimationComplete(false);
     setGameStats(prev => ({ ...prev, roundNum: prev.roundNum + 1 }));
     setTurnLog(populateDefaultTurnLog());
 
@@ -160,7 +168,7 @@ function Artillery() {
         msg: prev.msg + "player wins!\n"
       }));
       setGameStats(prev => ({ ...prev, gamesWon: prev.gamesWon + 1 }));
-      setIsEndgameScreen(true);
+      setWinner("human");
       return true;
     } else {
       setTurnLog(prev => ({
@@ -191,7 +199,7 @@ function Artillery() {
         msgNum: 2,
         msg: prev.msg + "CPU wins!\n"
       }));
-      setIsEndgameScreen(true);
+      setWinner("cpu");
       return true;
     } else {
       setTurnLog(prev => ({
@@ -379,7 +387,9 @@ function Artillery() {
             </div>
 
             <p>The distance between you and your opponent's base is: {gameSettings.baseDistanceGap} meters away.</p>
-            <p>{gameSettings.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
+            { !isEndgameScreen && <p>{gameSettings.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p> }
+            { isEndgameScreen && winner === "human" && animationComplete && <p style={{color: "#6F6"}}>YOU win!!!</p> }
+            { isEndgameScreen && winner === "cpu" && animationComplete && <p style={{color: "#F66"}}>The CPU wins...</p> }
 
             <div>
               <label className="artillery-input-label">
@@ -414,7 +424,7 @@ function Artillery() {
                   disabled={cpuData.firing || plyrData.firing} 
                 />
               </label>
-              { !isEndgameScreen && <button onClick={() => handleTurn()} disabled={cpuData.firing || plyrData.firing}>Play Turn!</button> }
+              { !isEndgameScreen && <button onClick={() => handleTurn()} disabled={cpuData.firing || plyrData.firing}>Play Turn</button> }
               { isEndgameScreen && <button onClick={() => startGame()} >New Game</button>}
             </div>
 
