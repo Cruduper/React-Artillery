@@ -7,9 +7,9 @@ import './artillery.scss';
 function Artillery() {
 
 /*******       Vars       *******/
-
   var seconds = 0; //time elapsed
   const scrollableContainerRef = useRef(null);
+  const isFiring = useRef(false)
     //refs for canvas
   const plyrBase = useRef(null);
   const cpuBase = useRef(null);
@@ -58,12 +58,6 @@ function Artillery() {
     }
   }, [gameSettings]);
 
-  useEffect(() => { //!DEBUG
-    if (gameSettings) {
-      console.log(gameSettings); 
-    };
-  }, [gameSettings]);
-
   useEffect(() => {
     const missileAnimation = (data) => {
       const missile = data.missileRef.current;
@@ -94,25 +88,12 @@ function Artillery() {
     };
 
     if (plyrData?.firing) {
-      console.log("player firing!");//!DEBUG
       const frameId = setInterval(() => missileAnimation(plyrData), conf.animationFrameDelay);
       return () => clearInterval(frameId);
     } else if (cpuData?.firing) {
-      console.log("CPU firing!");//!DEBUG
       const frameId = setInterval(() => missileAnimation(cpuData), conf.animationFrameDelay);
       return () => clearInterval(frameId);
     }
-
-      //!DEBUG
-      if (plyrData && cpuData){
-        // console.log("plyrData.baseCoords.x (center) =", (plyrData.baseCoords.x + baseRadius));
-        // console.log("cpuData.baseCoords.x (center) =", (cpuData.baseCoords.x - baseRadius));
-        // console.log("stageWidth =", conf.stageWidth);
-        // console.log("baseDistanceGap =", gameSettings.baseDistanceGap);
-        // console.log("getBaseOffset() =", getBaseOffset());
-        // console.log("player base x equation =", (0 - baseRadius + getBaseOffset()));
-      }
-      //!DEBUG
   }, [plyrData, cpuData]);
 
  useEffect(() => {
@@ -121,10 +102,6 @@ function Artillery() {
       scrollableContainer.scrollTop = scrollableContainer.scrollHeight;
     }
   }, [gameLog]);
-
-  useEffect(() => {
-    // console.log(cpuData?.choices); //!DEBUG
-  }, [cpuData]);
 
   useEffect(() => {
     if (turnLog?.msgNum === 2) {
@@ -191,15 +168,16 @@ function Artillery() {
   const cpuTurn = () => {
     const degrees = cpuData.choices.minDegreeBound + Math.random() * cpuData.choices.maxDegreeOffset;
     const speed = cpuData.choices.minSpeedBound + Math.random() * cpuData.choices.maxSpeedOffset;
+    const cpuMissileDist = calculateMissileTravel(degrees, speed);
     setCpuData(prev => ({ 
       ...prev, 
+      firing: true,
       choices: {
         ...prev.choices,
         degrees: degrees, 
         speed: speed 
       }
     }));
-    const cpuMissileDist = calculateMissileTravel(degrees, speed);
     if (isMissileHit(cpuMissileDist)) {
       setTurnLog(prev => ({
         ...prev,
