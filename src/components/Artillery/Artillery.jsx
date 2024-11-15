@@ -7,6 +7,7 @@ import './artillery.scss';
 function Artillery() {
 
 /*******       Vars       *******/
+
   var seconds = 0; //time elapsed
   const scrollableContainerRef = useRef(null);
     //refs for canvas
@@ -24,10 +25,10 @@ function Artillery() {
     missileSize: 10,
     baseDistanceMin: 350,
     baseDistanceMaxMod: 600,
-    stageWidth: 1000 + baseSize,
+    stageWidth: 980 + baseSize,
     stageHeight: 400,
     animationFrameDelay: 1,
-    timeScale: .2
+    timeScale: .1
   }
 
       //state
@@ -47,6 +48,22 @@ function Artillery() {
 
 
 /*******       useEffects       *******/
+  useEffect(() => {
+    if (gameSettings) {
+      setTurnLog(populateDefaultTurnLog());
+      setGameLog([]);
+      setIsEndgameScreen(false);
+      setPlyrData(populateDefaultPlyrData());
+      setCpuData(populateDefaultCpuData());
+    }
+  }, [gameSettings]);
+
+  useEffect(() => { //!DEBUG
+    if (gameSettings) {
+      console.log(gameSettings); 
+    };
+  }, [gameSettings]);
+
   useEffect(() => {
     const missileAnimation = (data) => {
       const missile = data.missileRef.current;
@@ -85,6 +102,17 @@ function Artillery() {
       const frameId = setInterval(() => missileAnimation(cpuData), conf.animationFrameDelay);
       return () => clearInterval(frameId);
     }
+
+      //!DEBUG
+      if (plyrData && cpuData){
+        // console.log("plyrData.baseCoords.x (center) =", (plyrData.baseCoords.x + baseRadius));
+        // console.log("cpuData.baseCoords.x (center) =", (cpuData.baseCoords.x - baseRadius));
+        // console.log("stageWidth =", conf.stageWidth);
+        // console.log("baseDistanceGap =", gameSettings.baseDistanceGap);
+        // console.log("getBaseOffset() =", getBaseOffset());
+        // console.log("player base x equation =", (0 - baseRadius + getBaseOffset()));
+      }
+      //!DEBUG
   }, [plyrData, cpuData]);
 
  useEffect(() => {
@@ -95,11 +123,7 @@ function Artillery() {
   }, [gameLog]);
 
   useEffect(() => {
-    setGameSettings(populateDefaultGameSettings());
-  }, []);
-
-  useEffect(() => {
-    console.log(cpuData?.choices); //!DEBUG
+    // console.log(cpuData?.choices); //!DEBUG
   }, [cpuData]);
 
   useEffect(() => {
@@ -113,18 +137,8 @@ function Artillery() {
 /*******       Functions       *******/
   const startGame = () => {
     setGameStats(prev => ({ ...prev, gamesPlayed: prev.gamesPlayed + 1, roundNum: 1 }));
-    resetGame();
+    setGameSettings(populateDefaultGameSettings());
   };
-
-  const resetGame = () => {
-    setGameSettings(populateDefaultGameSettings());
-    setPlyrData(populateDefaultPlyrData());
-    setCpuData(populateDefaultCpuData());
-    setTurnLog(populateDefaultTurnLog());
-    setGameLog([]);
-    setGameSettings(populateDefaultGameSettings());
-    setIsEndgameScreen(false);
-  }
 
   const resetMissile = (data) => {
     data.missileRef.current.x(data.missileCoords.initX);
@@ -168,7 +182,7 @@ function Artillery() {
       setTurnLog(prev => ({
         ...prev,
         msgNum: prev.msgNum + 1,
-        msg: prev.msg + `Your missile missed the CPU's base by ${playerMissileDist - gameSettings.baseDistanceGap} meters.\n`
+        msg: prev.msg + `YOUR missile (${playerMissileDist}m) missed the CPU's base by ${playerMissileDist - gameSettings.baseDistanceGap} meters.\n`
       }));
       return false;
     }
@@ -233,12 +247,12 @@ function Artillery() {
   };
 
   const missilePath = (degrees, launchSpeed, timeElapsed, direction) => {
-    const radianAngle = degrees * (Math.PI / 180);
+    const radians = degrees * (Math.PI / 180);
 
     if (direction === "horizontal") {
-      return launchSpeed*Math.cos(radianAngle)*timeElapsed;
+      return launchSpeed*Math.cos(radians)*timeElapsed;
     } else if (direction === "vertical") {
-      return launchSpeed*Math.sin(radianAngle)*timeElapsed - (0.5 * 9.81 * timeElapsed * timeElapsed);
+      return launchSpeed*Math.sin(radians)*timeElapsed - (0.5 * 9.80665 * timeElapsed * timeElapsed);
     }
   }
 
@@ -301,7 +315,7 @@ function Artillery() {
         initY: conf.stageHeight - conf.missileSize,
       },
       baseCoords: {
-        x: conf.stageWidth - conf.baseSize/2 - getBaseOffset(),
+        x: conf.stageWidth - baseRadius - getBaseOffset(),
         y: conf.stageHeight - conf.baseSize
       }
     }
@@ -322,14 +336,14 @@ function Artillery() {
   }
 
 
-/*******       RETURN      *******/
+/*******       JSX      *******/
   return (
     <div className="artillery-container">
         <h1>React Artillery</h1>
         { gameStats.gamesPlayed == 0 && (
           <button onClick={() => startGame()} >Start Game</button>
         )}
-        { gameStats.gamesPlayed > 0 && (
+        { gameStats.gamesPlayed > 0 && plyrData && cpuData &&(
           <div className="gameDisplay">
             <h2>Game #{gameStats.gamesPlayed}</h2>
             <h3>Round #{gameStats.roundNum}</h3>
