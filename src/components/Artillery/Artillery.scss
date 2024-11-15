@@ -14,10 +14,19 @@
   background-color: #ffdfd0;
 }
 
+.artillery-input {
+  width: 60px;
+}
+
+.artillery-input-label {
+  margin-right: 40px;
+}
+
 .artillery-log {
   background-color: white;
   color: black;
   font-size: small;
+  margin: auto;
   margin-top: 10px;
   margin-bottom: 10px;
   padding: 5px;

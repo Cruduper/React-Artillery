@@ -378,10 +378,10 @@ function Artillery() {
             <p>{gameSettings.isCpuFirst ? "The CPU" : "YOU"} will fire first.</p>
 
             <div>
-              <label>
+              <label className="artillery-input-label">
                 Angle:
                 <input 
-                  placeholder="Angle (degrees)" 
+                  className="artillery-input"
                   type="number"
                   value={plyrData.choices.degrees}  
                   onChange={(e) => setPlyrData(prev => ({ 
@@ -394,10 +394,10 @@ function Artillery() {
                   disabled={cpuData.firing || plyrData.firing} 
                 />
               </label>
-              <label>
+              <label className="artillery-input-label">
                 Speed:
                 <input 
-                  placeholder="Speed (m/s)" 
+                  className="artillery-input" 
                   type="number"
                   value={plyrData.choices.speed}
                   onChange={(e) => setPlyrData(prev => ({ 
