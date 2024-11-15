@@ -73,29 +73,36 @@ function Artillery() {
       }
       if (missile.y() > data.missileCoords.initY) {
         if (data.type === "human") {
-          setPlyrData(prev => ({
-            ...prev,
-            firing: false, 
-          }));
+          setPlyrData(prev => ({...prev, firing: false }));
         } else if (data.type === "cpu") {
-          setCpuData(prev => ({
-            ...prev,
-            firing: false, 
-          }));
+          setCpuData(prev => ({...prev, firing: false }));
         }
         resetMissile(data);
       }
     };
 
-    if (plyrData?.firing) {
-      const frameId = setInterval(() => missileAnimation(plyrData), conf.animationFrameDelay);
+    function handleMissileAnimation(data) {
+      const frameId = setInterval(() => missileAnimation(data), conf.animationFrameDelay);
       return () => clearInterval(frameId);
-    } else if (cpuData?.firing) {
-      const frameId = setInterval(() => missileAnimation(cpuData), conf.animationFrameDelay);
-      return () => clearInterval(frameId);
-    } else if (gameStats.roundNum > 1) {
-      setAnimationComplete(true);
-    }
+    };
+
+    if (!gameSettings?.isCpuFirst) {
+      if (plyrData?.firing) {
+        return handleMissileAnimation(plyrData)
+      } else if (cpuData?.firing) {
+        return handleMissileAnimation(cpuData)
+      } else if (gameStats.roundNum > 1) {
+        setAnimationComplete(true);
+      }
+    } else {
+      if (cpuData?.firing) {
+        return handleMissileAnimation(cpuData)
+      } else if (plyrData?.firing) {
+        return handleMissileAnimation(plyrData)
+      } else if (gameStats.roundNum > 1) {
+        setAnimationComplete(true);
+      }
+    } 
   }, [plyrData?.firing, cpuData?.firing]);
 
  useEffect(() => {
@@ -144,10 +151,7 @@ function Artillery() {
     var degrees = plyrData.choices.degrees; 
     var speed = plyrData.choices.speed;
     const playerMissileDist = calculateMissileTravel(degrees, speed);
-    setPlyrData(prevState => ({
-      ...prevState,
-      firing: true, 
-    }));
+    setPlyrData(prevState => ({...prevState, firing: true }));
 
     if (isMissileHit(playerMissileDist)) {
       setTurnLog(prev => ({
