@@ -332,14 +332,16 @@ function Artillery() {
 /*******       JSX      *******/
   return (
     <div className="artillery-container">
-        <h1>React Artillery</h1>
+        <h1 className="artillery-main-header">React Artillery</h1>
         { gameStats.gamesPlayed == 0 && (
-          <button onClick={() => startGame()} >Start Game</button>
+          <button className="artillery-button" onClick={() => startGame()} >Start Game</button>
         )}
         { gameStats.gamesPlayed > 0 && plyrData && cpuData &&(
           <div className="gameDisplay">
-            <h2>Game #{gameStats.gamesPlayed}</h2>
-            <h3>Round #{gameStats.roundNum}</h3>
+            <div className="game-and-round-container">
+              <h3 className="game-number">Game #{gameStats.gamesPlayed}</h3>
+              <h3 className="round-number">Round #{gameStats.roundNum}</h3>
+            </div>
             <div className="artillery-animation">
               <Stage width={conf.stageWidth} height={conf.stageHeight}>
                 <Layer>
@@ -424,8 +426,17 @@ function Artillery() {
                   disabled={cpuData.firing || plyrData.firing} 
                 />
               </label>
-              { !isEndgameScreen && <button onClick={() => handleTurn()} disabled={cpuData.firing || plyrData.firing}>Play Turn</button> }
-              { isEndgameScreen && <button onClick={() => startGame()} >New Game</button>}
+              { !isEndgameScreen && 
+                <button 
+                  className="artillery-button" 
+                  onClick={() => handleTurn()} 
+                  disabled={cpuData.firing || plyrData.firing}
+                >
+                  Play Turn
+                </button> 
+              }
+              { isEndgameScreen && 
+                <button className="artillery-button" onClick={() => startGame()} >New Game</button>}
             </div>
 
             <div className="artillery-log" ref={scrollableContainerRef}>

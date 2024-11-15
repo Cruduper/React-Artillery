@@ -15,11 +15,16 @@
 }
 
 .artillery-input {
-  width: 60px;
+  width: 46px;
+  padding-left: 13px;
 }
 
 .artillery-input-label {
   margin-right: 40px;
+}
+
+.artillery-button {
+  width: 130px;
 }
 
 .artillery-log {
@@ -33,4 +38,19 @@
   height: 200px;
   width: 60vw;
   overflow-y: auto;
+}
+.artillery-main-header {
+  font-size: 3em;
+  margin: 0;
+}
+
+.game-and-round-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.game-number, .round-number{
+  margin: 0;
+  align-self: flex-end;
 }
