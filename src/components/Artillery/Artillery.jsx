@@ -70,21 +70,27 @@ function Artillery() {
   useEffect(() => {
     const missileAnimation = (data) => {
       const missile = data.missileRef.current;
+      const speed = data.choices.speed;
+      const degrees = data.choices.degrees;
       
-      var xDisplacement = missilePath(data.choices.degrees, data.choices.speed, seconds, "horizontal");
-      var yDisplacement = missilePath(data.choices.degrees, data.choices.speed, seconds, "vertical");
+      var xDisplacement = missilePath(degrees, speed, seconds, "horizontal");
+      var yDisplacement = missilePath(degrees, speed, seconds, "vertical");
 
       if (missile.y() <= data.missileCoords.initY) {
         missile.x(data.missileCoords.initX + (xDisplacement * data.missileDirection));
         missile.y(data.missileCoords.initY - yDisplacement);
-        seconds += 1 * conf.timeScale, 
+        seconds += 1 * conf.timeScale; 
+        const angleChange = conf.timeScale * getRotationRate(data);
+
+        missile.rotate(angleChange);
         missile.getLayer().batchDraw();
-      }
-      if (missile.y() > data.missileCoords.initY) {
+
+
+      } else {
         if (data.type === "human") {
-          setPlyrData(prev => ({...prev, firing: false }));
+          setPlyrData(prev => ({...prev, firing: false, missileOpacity: 0}));
         } else if (data.type === "cpu") {
-          setCpuData(prev => ({...prev, firing: false }));
+          setCpuData(prev => ({...prev, firing: false, missileOpacity: 0}));
         }
         resetMissile(data);
       }
@@ -97,16 +103,24 @@ function Artillery() {
 
     if (!gameSettings?.isCpuFirst) {
       if (plyrData?.firing) {
+        setPlyrData(prev => ({...prev, missileOpacity: 1}));
+        plyrData.missileRef.current.rotation(-1 * plyrData.choices.degrees + 90);
         return handleMissileAnimation(plyrData)
       } else if (cpuData?.firing) {
+        setCpuData(prev => ({...prev, missileOpacity: 1}));
+        cpuData.missileRef.current.rotation(cpuData.choices.degrees - 90);
         return handleMissileAnimation(cpuData)
       } else if (gameStats.roundNum > 1) {
         setAnimationComplete(true);
       }
     } else {
       if (cpuData?.firing) {
+        setCpuData(prev => ({...prev, missileOpacity: 1}));
+        cpuData.missileRef.current.rotation(cpuData.choices.degrees - 90);
         return handleMissileAnimation(cpuData)
       } else if (plyrData?.firing) {
+        setPlyrData(prev => ({...prev, missileOpacity: 1}));
+        plyrData.missileRef.current.rotation(-1 * plyrData.choices.degrees + 90);
         return handleMissileAnimation(plyrData)
       } else if (gameStats.roundNum > 1) {
         setAnimationComplete(true);
@@ -114,7 +128,7 @@ function Artillery() {
     } 
   }, [plyrData?.firing, cpuData?.firing]);
 
- useEffect(() => {
+  useEffect(() => {
     const scrollableContainer = scrollableContainerRef.current;
     if (scrollableContainer) {
       scrollableContainer.scrollTop = scrollableContainer.scrollHeight;
@@ -242,22 +256,40 @@ function Artillery() {
   };
 
   const calculateMissileTravel = (degrees, speed) => {
-    const radians = degrees * (Math.PI / 180);
-    return Math.floor((speed * speed * Math.sin(2 * radians)) / 9.80665);
+    const angleRad = degreesToRadians(degrees);
+    return Math.floor((speed * speed * Math.sin(2 * angleRad)) / 9.80665);
   };
 
   const missilePath = (degrees, launchSpeed, timeElapsed, direction) => {
-    const radians = degrees * (Math.PI / 180);
+    const angleRad = degreesToRadians(degrees);
 
     if (direction === "horizontal") {
-      return launchSpeed*Math.cos(radians)*timeElapsed;
+      return launchSpeed*Math.cos(angleRad)*timeElapsed;
     } else if (direction === "vertical") {
-      return launchSpeed*Math.sin(radians)*timeElapsed - (0.5 * 9.80665 * timeElapsed * timeElapsed);
+      return launchSpeed*Math.sin(angleRad)*timeElapsed - (0.5 * 9.80665 * timeElapsed * timeElapsed);
     }
   }
 
   const isMissileHit = (playerMissileDist) => {
     return Math.abs(playerMissileDist - gameSettings.baseDistanceGap) <= (conf.baseRadius/1.3);
+  }
+
+  const degreesToRadians = (degrees) => { 
+    return degrees * Math.PI / 180;
+  }
+
+  const radiansToDegrees = (radians) => {
+    return radians * 180 /Math.PI;
+  }
+
+  const getRotationRate = (data) => {
+      const speed = data.choices.speed;
+      const degrees = data.choices.degrees;
+      const angleRad = degreesToRadians(degrees);
+      const animationTotalSecs = (2 * speed * Math.sin(angleRad))/ 9.80665; //time elapsed from y=0 to y=0 again on parabola
+      const radiansPerSec = (2 * angleRad * data.missileDirection) / animationTotalSecs; //total rotation is double the starting angle
+      const degreesPerSec = radiansToDegrees(radiansPerSec);
+      return degreesPerSec;
   }
 
   const getBaseDistance = () => {
@@ -280,6 +312,7 @@ function Artillery() {
       type: "human",
       missileRef: plyrMissile,
       missileDirection: 1,
+      missileOpacity: 0,
       firing: false,
       choices: {
         degrees: 45,
@@ -301,6 +334,7 @@ function Artillery() {
       type: "cpu",
       missileRef: cpuMissile,
       missileDirection: -1, //moves left instead of right
+      missileOpacity: 0,
       firing: false,
       choices: {
         degrees: 0,
@@ -357,6 +391,8 @@ function Artillery() {
                     ref={cpuData.missileRef}
                     x={cpuData.missileCoords.initX}
                     y={cpuData.missileCoords.initY}
+                    opacity={cpuData.missileOpacity}
+                    offsetY={30}
                   />
                 </Layer>
                 <Layer>
@@ -365,6 +401,8 @@ function Artillery() {
                     ref={plyrData.missileRef}
                     x={plyrData.missileCoords.initX}
                     y={plyrData.missileCoords.initY}
+                    opacity={plyrData.missileOpacity}
+                    offsetY={30}
                   />
                 </Layer>
                 <Layer>
@@ -377,7 +415,6 @@ function Artillery() {
                     height={conf.baseSize}
                   />
                 </Layer>
-
                 <Layer>
                   <Image
                     image={baseImg}
