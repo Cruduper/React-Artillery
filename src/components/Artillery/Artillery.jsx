@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Stage, Layer, Rect, Image } from 'react-konva';
+import { Stage, Layer, Image } from 'react-konva';
 import useImage from 'use-image';
 import './artillery.scss';
 import baseImage from '../../assets/base_graphic.png';
+import missileImage from '../../assets/missile_graphic.png';
 
 
 
@@ -50,6 +51,7 @@ function Artillery() {
 
       //other hooks
   const [baseImg] = useImage(baseImage);
+  const [missileImg] = useImage(missileImage);
 
 
 
@@ -350,23 +352,19 @@ function Artillery() {
             <div className="artillery-animation">
               <Stage width={conf.stageWidth} height={conf.stageHeight}>
                 <Layer>
-                  <Rect
+                  <Image
+                    image={missileImg}
                     ref={cpuData.missileRef}
                     x={cpuData.missileCoords.initX}
                     y={cpuData.missileCoords.initY}
-                    width={conf.missileSize}
-                    height={conf.missileSize}
-                    fill="blue"
                   />
                 </Layer>
                 <Layer>
-                  <Rect
+                  <Image
+                    image={missileImg}
                     ref={plyrData.missileRef}
                     x={plyrData.missileCoords.initX}
                     y={plyrData.missileCoords.initY}
-                    width={conf.missileSize}
-                    height={conf.missileSize}
-                    fill="red"
                   />
                 </Layer>
                 <Layer>
