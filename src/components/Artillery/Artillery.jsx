@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Stage, Layer, Rect } from 'react-konva';
+import { Stage, Layer, Rect, Image } from 'react-konva';
+import useImage from 'use-image';
 import './artillery.scss';
+import baseImage from '../../assets/base_graphic.png';
 
 
 
@@ -45,6 +47,9 @@ function Artillery() {
   const [isEndgameScreen, setIsEndgameScreen] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [winner, setWinner] = useState();
+
+      //other hooks
+  const [baseImg] = useImage(baseImage);
 
 
 
@@ -365,24 +370,24 @@ function Artillery() {
                   />
                 </Layer>
                 <Layer>
-                  <Rect
+                  <Image
+                    image={baseImg}
                     ref={plyrBase}
                     x={plyrData.baseCoords.x}
                     y={plyrData.baseCoords.y}
                     width={conf.baseSize}
                     height={conf.baseSize}
-                    fill="rgba(0, 0, 0, 0.35)"
                   />
                 </Layer>
 
                 <Layer>
-                  <Rect
+                  <Image
+                    image={baseImg}
                     ref={cpuBase}
                     x={cpuData.baseCoords.x}
                     y={cpuData.baseCoords.y}
                     width={conf.baseSize}
                     height={conf.baseSize}
-                    fill="rgba(0, 0, 0, 0.35)"
                   />
                 </Layer>
               </Stage>
