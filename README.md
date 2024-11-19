@@ -30,6 +30,8 @@ This is a remake of a former student project, which was a text-only console vers
 * _add randomly generated terrain_
 * _add more robust 2-dimensional hit detection (necessary for randomly generated terrain)_
 * _add wind_
+* _add clouds that move in direction and speed of wind_
+* _add nicer backgrounds_
 <br><br/>
 
 ### 🔧 Setup/Installation
