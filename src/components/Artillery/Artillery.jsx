@@ -395,7 +395,7 @@ function Artillery() {
                     x={cpuData.missileCoords.initX}
                     y={cpuData.missileCoords.initY}
                     opacity={cpuData.missileOpacity}
-                    offsetY={30}
+                    // offsetY={30}
                   />
                 </Layer>
                 <Layer>
@@ -405,7 +405,7 @@ function Artillery() {
                     x={plyrData.missileCoords.initX}
                     y={plyrData.missileCoords.initY}
                     opacity={plyrData.missileOpacity}
-                    offsetY={30}
+                    // offsetY={30}
                   />
                 </Layer>
                 <Layer>
