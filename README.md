@@ -1,12 +1,12 @@
 # React Artillery
 <div align="center">
-  <img src="demopicture.png" alt="screen capture of React Artillery app" style="width:60%; height:auto;">
+  <img src="demopicture.png" alt="screen capture of React Artillery app" style="width:90%; height:auto;">
 </div>
 
 --- 
 
 ### 📖 Description
-...work in progress...
+This is a remake of a former student project, which was a text-only console version of the game Artillery, which you can find [here](https://github.com/Cruduper/Artillery-Java141). I decided I wanted to port it over to Javascript and create a UI with simple graphics and animations.   
 <br><br/> 
 
 ### 🛠 Technologies Used
@@ -23,6 +23,13 @@
 ### 🦠 Known Bugs OR Issues
 
 ...work in progress...
+<br><br/>
+
+### ⏳ To-Do List
+
+* _add randomly generated terrain_
+* _add more robust 2-dimensional hit detection (necessary for randomly generated terrain)_
+* _add wind_
 <br><br/>
 
 ### 🔧 Setup/Installation
