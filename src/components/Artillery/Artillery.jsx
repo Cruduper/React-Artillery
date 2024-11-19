@@ -4,6 +4,7 @@ import useImage from 'use-image';
 import './artillery.scss';
 import baseImage from '../../assets/base_graphic.png';
 import missileImage from '../../assets/missile_graphic.png';
+import winScrollImage from '../../assets/win_scroll.png';
 
 
 
@@ -17,6 +18,7 @@ function Artillery() {
   const cpuBase = useRef(null);
   const plyrMissile = useRef(null);
   const cpuMissile = useRef(null);
+  const winScroll = useRef(null);
 
     //config vars
   const baseRadius = 10;
@@ -52,6 +54,7 @@ function Artillery() {
       //other hooks
   const [baseImg] = useImage(baseImage);
   const [missileImg] = useImage(missileImage);
+  const [winScrollImg] = useImage(winScrollImage);
 
 
 
@@ -423,6 +426,17 @@ function Artillery() {
                     y={cpuData.baseCoords.y}
                     width={conf.baseSize}
                     height={conf.baseSize}
+                  />
+                </Layer>
+                <Layer>
+                  <Image
+                    image={winScrollImg}
+                    ref={winScroll}
+                    x={conf.stageWidth / 2}
+                    y={conf.stageHeight / 2}
+                    opacity={isEndgameScreen ? (winner === "human" ? 1 : 0) : 0}
+                    offsetX={winScrollImg.width / 2}
+                    offsetY={winScrollImg.height / 2}
                   />
                 </Layer>
               </Stage>
