@@ -27,6 +27,7 @@ function Artillery() {
     baseRadius: baseRadius,
     baseSize: baseSize,
     missileSize: 5,
+    missileRotationAngleOffset: -16, //more negative values make missile appear more "self-propelled"
     baseDistanceMin: 400,
     baseDistanceMaxMod: 400, //min and maxMod should equal stageWidth
     stageWidth: 780 + baseSize,
@@ -107,11 +108,11 @@ function Artillery() {
     if (!gameSettings?.isCpuFirst) {
       if (plyrData?.firing) {
         setPlyrData(prev => ({...prev, missileOpacity: 1}));
-        plyrData.missileRef.current.rotation(-1 * plyrData.choices.degrees + 90);
+        plyrData.missileRef.current.rotation(-1 * plyrData.choices.degrees + 90 + conf.missileRotationAngleOffset);
         return handleMissileAnimation(plyrData)
       } else if (cpuData?.firing) {
         setCpuData(prev => ({...prev, missileOpacity: 1}));
-        cpuData.missileRef.current.rotation(cpuData.choices.degrees - 90);
+        cpuData.missileRef.current.rotation(cpuData.choices.degrees - 90 - conf.missileRotationAngleOffset);
         return handleMissileAnimation(cpuData)
       } else if (gameStats.roundNum > 1) {
         setAnimationComplete(true);
@@ -119,11 +120,11 @@ function Artillery() {
     } else {
       if (cpuData?.firing) {
         setCpuData(prev => ({...prev, missileOpacity: 1}));
-        cpuData.missileRef.current.rotation(cpuData.choices.degrees - 90);
+        cpuData.missileRef.current.rotation(cpuData.choices.degrees - 90 - conf.missileRotationAngleOffset);
         return handleMissileAnimation(cpuData)
       } else if (plyrData?.firing) {
         setPlyrData(prev => ({...prev, missileOpacity: 1}));
-        plyrData.missileRef.current.rotation(-1 * plyrData.choices.degrees + 90);
+        plyrData.missileRef.current.rotation(-1 * plyrData.choices.degrees + 90 + conf.missileRotationAngleOffset);
         return handleMissileAnimation(plyrData)
       } else if (gameStats.roundNum > 1) {
         setAnimationComplete(true);
